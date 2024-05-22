@@ -8,20 +8,55 @@
 			defer
 			src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
 		></script>
+		<style>
+			.complete {
+				text-decoration: line-through;
+			}
+		</style>
 	</head>
 	<body>
-		<div x-data="globalData">
-			<h1 x-text="message"></h1>
-			<button @click="increment">increment</button>
-			<p x-text="count"></p>
-		</div>
+		<section x-data="todo">
+			<h1>Todo List</h1>
+			<input type="text" x-model="newTodo" @keydown.enter="addTodo()" />
+			<ul>
+				<template x-for="todo in todos">
+					<li :class="todo.complete ? 'complete' : ''">
+						<input type="checkbox" x-model="todo.complete" />
+						<label x-text="todo.title"></label>
+						<button @click="removeTodo(todo)">x</button>
+					</li>
+				</template>
+			</ul>
+		</section>
 		<script>
 			document.addEventListener('alpine:init', () => {
-				Alpine.data('globalData', () => ({
-					message: 'Foo bar',
-					count: 0,
-					increment() {
-						this.count++;
+				Alpine.data('todo', () => ({
+					todos: [
+						{
+							id: 1,
+							title: 'Belajar Alpine.js',
+							complete: true,
+						},
+						{
+							id: 2,
+							title: 'Kuliah S3',
+							complete: false,
+						},
+					],
+					newTodo: '',
+					addTodo() {
+						if (this.newTodo) {
+							this.todos.push({
+								id: this.todos.length + 1,
+								title: this.newTodo,
+								complete: false,
+							});
+
+							this.newTodo = '';
+						}
+					},
+					removeTodo(todo) {
+						this.todos = this.todos.filter((t) => t !== todo);
 					},
 				}));
 			});

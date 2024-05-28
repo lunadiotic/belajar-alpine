@@ -3,63 +3,69 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Belajar Alpine.js</title>
+		<title>Member List with Pagination</title>
 		<script
+			src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"
 			defer
-			src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
 		></script>
-		<style>
-			.complete {
-				text-decoration: line-through;
-			}
-		</style>
+		<link
+			href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+			rel="stylesheet"
+		/>
 	</head>
-	<body>
-		<section x-data="todo">
-			<h1>Todo List</h1>
-			<input type="text" x-model="newTodo" @keydown.enter="addTodo()" />
-			<ul>
-				<template x-for="todo in todos">
-					<li :class="todo.complete ? 'complete' : ''">
-						<input type="checkbox" x-model="todo.complete" />
-						<label x-text="todo.title"></label>
-						<button @click="removeTodo(todo)">x</button>
-					</li>
+	<body class="bg-gray-100 p-6">
+		<div x-data="paginationComponent()" class="container mx-auto">
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+				<template x-for="(member, index) in paginatedMembers" :key="index">
+					<div class="bg-white shadow-md rounded-lg overflow-hidden">
+						<img
+							:src="member.photo"
+							alt="Profile Picture"
+							class="w-48 h-48 mx-auto mt-4 object-cover"
+						/>
+						<div class="p-4">
+							<h2 class="text-xl font-bold" x-text="member.name"></h2>
+							<p class="text-gray-700">
+								Age: <span x-text="member.age"></span>
+							</p>
+							<p class="text-gray-700">
+								Gender: <span x-text="member.gender"></span>
+							</p>
+							<p class="text-gray-700">
+								Address: <span x-text="member.address"></span>
+							</p>
+						</div>
+					</div>
 				</template>
-			</ul>
-		</section>
-		<script>
-			document.addEventListener('alpine:init', () => {
-				Alpine.data('todo', () => ({
-					todos: [
-						{
-							id: 1,
-							title: 'Belajar Alpine.js',
-							complete: true,
-						},
-						{
-							id: 2,
-							title: 'Kuliah S3',
-							complete: false,
-						},
-					],
-					newTodo: '',
-					addTodo() {
-						if (this.newTodo) {
-							this.todos.push({
-								id: this.todos.length + 1,
-								title: this.newTodo,
-								complete: false,
-							});
-
-							this.newTodo = '';
-						}
-					},
-					removeTodo(todo) {
-						this.todos = this.todos.filter((t) => t !== todo);
-					},
-				}));
-			});
-		</script>
+			</div>
+			<div class="flex justify-center mt-6">
+				<button
+					@click="prevPage"
+					:disabled="currentPage === 1"
+					class="px-4 py-2 mx-1 bg-gray-300 text-gray-800 rounded disabled:opacity-50"
+					x-show="currentPage !== 1"
+				>
+					Previous
+				</button>
+				<template x-for="page in totalPages" :key="page">
+					<button
+						@click="changePage(page)"
+						:class="{'bg-blue-500 text-white': currentPage === page, 'bg-gray-300 text-gray-800': currentPage !== page}"
+						class="px-4 py-2 mx-1 rounded"
+					>
+						<span x-text="page"></span>
+					</button>
+				</template>
+				<button
+					@click="nextPage"
+					:disabled="currentPage === totalPages"
+					class="px-4 py-2 mx-1 bg-gray-300 text-gray-800 rounded disabled:opacity-50"
+					x-show="currentPage !== totalPages"
+				>
+					Next
+				</button>
+			</div>
+		</div>
+		<script src="app.js"></script>
 	</body>
 </html>

@@ -3,63 +3,92 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Belajar Alpine.js</title>
+		<title>Tic Tac Toe</title>
 		<script
-			defer
 			src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+			defer
 		></script>
-		<style>
-			.complete {
-				text-decoration: line-through;
-			}
-		</style>
+		<link
+			href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+			rel="stylesheet"
+		/>
 	</head>
-	<body>
-		<section x-data="todo">
-			<h1>Todo List</h1>
-			<input type="text" x-model="newTodo" @keydown.enter="addTodo()" />
-			<ul>
-				<template x-for="todo in todos">
-					<li :class="todo.complete ? 'complete' : ''">
-						<input type="checkbox" x-model="todo.complete" />
-						<label x-text="todo.title"></label>
-						<button @click="removeTodo(todo)">x</button>
-					</li>
+	<body class="bg-gray-100 flex items-center justify-center h-screen">
+		<div x-data="ticTacToe()" class="text-center">
+			<h1 class="text-4xl font-bold mb-4">Tic Tac Toe</h1>
+			<div class="grid grid-cols-3 gap-2 w-64 mx-auto">
+				<template x-for="(cell, index) in board" :key="index">
+					<div
+						@click="makeMove(index)"
+						class="w-20 h-20 flex items-center justify-center text-3xl font-bold bg-white border border-gray-300"
+						:class="{'bg-green-200': cell === 'X', 'bg-red-200': cell === 'O'}"
+						x-text="cell"
+					></div>
 				</template>
-			</ul>
-		</section>
-		<script>
-			document.addEventListener('alpine:init', () => {
-				Alpine.data('todo', () => ({
-					todos: [
-						{
-							id: 1,
-							title: 'Belajar Alpine.js',
-							complete: true,
-						},
-						{
-							id: 2,
-							title: 'Kuliah S3',
-							complete: false,
-						},
-					],
-					newTodo: '',
-					addTodo() {
-						if (this.newTodo) {
-							this.todos.push({
-								id: this.todos.length + 1,
-								title: this.newTodo,
-								complete: false,
-							});
+			</div>
+			<div class="mt-4">
+				<template x-if="winner">
+					<div class="text-2xl font-bold" x-text="`Winner: ${winner}`"></div>
+				</template>
+				<template x-if="isDraw && !winner">
+					<div class="text-2xl font-bold">It's a draw!</div>
+				</template>
+				<button
+					@click="resetGame"
+					class="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+				>
+					Restart
+				</button>
+			</div>
+		</div>
 
-							this.newTodo = '';
+		<script>
+			function ticTacToe() {
+				return {
+					board: Array(9).fill(''),
+					currentPlayer: 'X',
+					winner: null,
+					isDraw: false,
+					makeMove(index) {
+						if (this.board[index] === '' && !this.winner) {
+							this.board[index] = this.currentPlayer;
+							if (this.checkWinner()) {
+								this.winner = this.currentPlayer;
+							} else if (this.board.every((cell) => cell !== '')) {
+								this.isDraw = true;
+							} else {
+								this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+							}
 						}
 					},
-					removeTodo(todo) {
-						this.todos = this.todos.filter((t) => t !== todo);
+					checkWinner() {
+						const winningCombinations = [
+							[0, 1, 2],
+							[3, 4, 5],
+							[6, 7, 8],
+							[0, 3, 6],
+							[1, 4, 7],
+							[2, 5, 8],
+							[0, 4, 8],
+							[2, 4, 6],
+						];
+						return winningCombinations.some((combination) => {
+							const [a, b, c] = combination;
+							return (
+								this.board[a] &&
+								this.board[a] === this.board[b] &&
+								this.board[a] === this.board[c]
+							);
+						});
 					},
-				}));
-			});
+					resetGame() {
+						this.board = Array(9).fill('');
+						this.currentPlayer = 'X';
+						this.winner = null;
+						this.isDraw = false;
+					},
+				};
+			}
 		</script>
 	</body>
 </html>

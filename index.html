@@ -3,63 +3,89 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Belajar Alpine.js</title>
+		<title>Calculator</title>
 		<script
-			defer
 			src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+			defer
 		></script>
-		<style>
-			.complete {
-				text-decoration: line-through;
-			}
-		</style>
+		<script src="https://cdn.tailwindcss.com"></script>
 	</head>
-	<body>
-		<section x-data="todo">
-			<h1>Todo List</h1>
-			<input type="text" x-model="newTodo" @keydown.enter="addTodo()" />
-			<ul>
-				<template x-for="todo in todos">
-					<li :class="todo.complete ? 'complete' : ''">
-						<input type="checkbox" x-model="todo.complete" />
-						<label x-text="todo.title"></label>
-						<button @click="removeTodo(todo)">x</button>
-					</li>
-				</template>
-			</ul>
-		</section>
-		<script>
-			document.addEventListener('alpine:init', () => {
-				Alpine.data('todo', () => ({
-					todos: [
-						{
-							id: 1,
-							title: 'Belajar Alpine.js',
-							complete: true,
-						},
-						{
-							id: 2,
-							title: 'Kuliah S3',
-							complete: false,
-						},
-					],
-					newTodo: '',
-					addTodo() {
-						if (this.newTodo) {
-							this.todos.push({
-								id: this.todos.length + 1,
-								title: this.newTodo,
-								complete: false,
-							});
+	<body class="bg-gray-100 flex items-center justify-center h-screen">
+		<div x-data="calculator()" class="bg-white p-6 rounded shadow-md w-80">
+			<div class="text-right mb-4">
+				<input
+					type="text"
+					x-model="current"
+					class="w-full text-2xl border border-gray-300 p-2 rounded"
+					readonly
+				/>
+			</div>
+			<div class="grid grid-cols-4 gap-2">
+				<button @click="clear" class="bg-red-500 text-white p-4 rounded">
+					C
+				</button>
+				<button @click="deleteLast" class="bg-gray-300 p-4 rounded">
+					&larr;
+				</button>
+				<button @click="append('%')" class="bg-gray-300 p-4 rounded">%</button>
+				<button @click="append('/')" class="bg-blue-500 text-white p-4 rounded">
+					/
+				</button>
 
-							this.newTodo = '';
+				<button @click="append('7')" class="bg-gray-200 p-4 rounded">7</button>
+				<button @click="append('8')" class="bg-gray-200 p-4 rounded">8</button>
+				<button @click="append('9')" class="bg-gray-200 p-4 rounded">9</button>
+				<button @click="append('*')" class="bg-blue-500 text-white p-4 rounded">
+					*
+				</button>
+
+				<button @click="append('4')" class="bg-gray-200 p-4 rounded">4</button>
+				<button @click="append('5')" class="bg-gray-200 p-4 rounded">5</button>
+				<button @click="append('6')" class="bg-gray-200 p-4 rounded">6</button>
+				<button @click="append('-')" class="bg-blue-500 text-white p-4 rounded">
+					-
+				</button>
+
+				<button @click="append('1')" class="bg-gray-200 p-4 rounded">1</button>
+				<button @click="append('2')" class="bg-gray-200 p-4 rounded">2</button>
+				<button @click="append('3')" class="bg-gray-200 p-4 rounded">3</button>
+				<button @click="append('+')" class="bg-blue-500 text-white p-4 rounded">
+					+
+				</button>
+
+				<button @click="append('0')" class="col-span-2 bg-gray-200 p-4 rounded">
+					0
+				</button>
+				<button @click="append('.')" class="bg-gray-200 p-4 rounded">.</button>
+				<button @click="calculate" class="bg-green-500 text-white p-4 rounded">
+					=
+				</button>
+			</div>
+		</div>
+		<script>
+			function calculator() {
+				return {
+					current: '',
+					append(char) {
+						this.current += char;
+					},
+					clear() {
+						this.current = '';
+					},
+					deleteLast() {
+						if (this.current.length > 0) {
+							this.current = this.current.slice(0, -1);
 						}
 					},
-					removeTodo(todo) {
-						this.todos = this.todos.filter((t) => t !== todo);
+					calculate() {
+						try {
+							this.current = eval(this.current);
+						} catch (e) {
+							this.current = 'Error';
+						}
 					},
-				}));
-			});
+				};
+			}
 		</script>
 	</body>
 </html>

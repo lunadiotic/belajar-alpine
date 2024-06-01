@@ -79,10 +79,36 @@
 					},
 					calculate() {
 						try {
-							this.current = eval(this.current);
+							if (this.current.includes('%')) {
+								this.current = this.calculatePercentage(this.current);
+							} else {
+								this.current = eval(this.current);
+							}
 						} catch (e) {
 							this.current = 'Error';
 						}
+					},
+					calculatePercentage(expression) {
+						// Regular expression to find numbers and operators
+						const regex = /(\d+\.?\d*)([+\-*/])(\d+\.?\d*)%/;
+						const match = expression.match(regex);
+
+						if (match) {
+							const [_, num1, operator, num2] = match;
+							const percentage = (parseFloat(num2) / 100) * parseFloat(num1);
+							switch (operator) {
+								case '+':
+									return parseFloat(num1) + percentage;
+								case '-':
+									return parseFloat(num1) - percentage;
+								case '*':
+									return parseFloat(num1) * percentage;
+								case '/':
+									return parseFloat(num1) / percentage;
+							}
+						}
+
+						return expression;
 					},
 				};
 			}

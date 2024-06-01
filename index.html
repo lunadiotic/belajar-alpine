@@ -3,9 +3,9 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Member List with Pagination</title>
+		<title>Member List with Pagination and Search</title>
 		<script
-			src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"
+			src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
 			defer
 		></script>
 		<link
@@ -14,7 +14,20 @@
 		/>
 	</head>
 	<body class="bg-gray-100 p-6">
-		<div x-data="paginationComponent()" class="container mx-auto">
+		<div
+			x-data="paginationComponent()"
+			x-init="init()"
+			class="container mx-auto"
+		>
+			<div class="mb-4">
+				<input
+					x-model="searchQuery"
+					@input="searchMembers"
+					type="text"
+					placeholder="Search members..."
+					class="px-4 py-2 border rounded w-full"
+				/>
+			</div>
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 				<template x-for="(member, index) in paginatedMembers" :key="index">
 					<div class="bg-white shadow-md rounded-lg overflow-hidden">
